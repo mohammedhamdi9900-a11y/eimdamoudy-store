@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float
+  image       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}@default(4.5)
+  image     String
+  createdAt DateTime @default(now())
+  items     OrderItem[]
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  code          String      @unique
+  userId        String?
+  user          User?       @relation(fields: [userId], references: [id])
+  name          String
+  phone         String
+  city          String
+  address       String
+  notes         String?
+  status        OrderStatus @default(PENDING_DEPOSIT)
+  paymentMethod PaymentMethod
+  subtotal      Int
+  deliveryFee   Int
+  depositDue    Int
+  depositPaid   Int         @default(0)
+  total         Int
+  createdAt     DateTime    @default(now())
+  items         OrderItem[]
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id]) onDelete: Cascade
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  name      String
+  price     Int
+  qty       Int
+}
+
+model Settings {
+  id              Int     @id @default(1)
+  storeName       String  @default("EIMdamoudy")
+  logoUrl         String  @default("")
+  depositPercent  Int     @default(10)
+  codEnabled      Boolean @default(true)
+  deliveryJson    String  @default("[{\"city\":\"Cairo\",\"fee\":60},{\"city\":\"Giza\",\"fee\":70},{\"city\":\"Alexandria\",\"fee\":120},{\"city\":\"Other\",\"fee\":150}]")
+  paymentNote     String  @default("Bank: Bank Misr, Acc: 00000000, Wallet: 01000000000")
+  about           String  @default("Tires & Batteries with in-house delivery.")
+  privacy         String  @default("Privacy policy here.")
+  terms           String  @default("Terms of service here.")
+}
+
+enum OrderStatus {
+  PENDING_DEPOSIT
+  DEPOSIT_CONFIRMED
+  PREPARING
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  DEPOSIT_COD
+  COD_ONLY
+}

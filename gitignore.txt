@@ -1,0 +1,14 @@
+/node_modules
+/.pnp
+.pnp.js
+/build
+/.next/
+/out/
+*.db
+*.sqlite
+/prisma/migrations/
+.env
+.env.local
+.env.production
+*.log
+.DS_Store
